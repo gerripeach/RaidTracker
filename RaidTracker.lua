@@ -10,6 +10,7 @@ function RaidTracker:OnLoadCustom( frame )
 	frame:RegisterEvent("CHAT_MSG_LOOT")
 	frame:RegisterEvent("CHAT_MSG_SYSTEM")
 	frame:RegisterEvent("CHAT_MSG_RAID")
+	frame:RegisterEvent("CHAT_MSG_RAID_LEADER")
 	frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 	frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	frame:RegisterEvent("CHAT_MSG_MONSTER_YELL")
@@ -155,7 +156,6 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 		
 	elseif event == "CHAT_MSG_RAID" then
 		local msg = select(1,...)
-		self:Print("CHAT_MSG_RAID")
 		
 		local sPlayer, sLink, sCost;
 		-- check for general string match according to WebDKP
@@ -168,6 +168,23 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 		
 		if not sLink or not sPlayer or not sCost then return end
 		
+		self:Print("Added Item to DB")
+		self:AddLootItemDB( o.CurrentRaid, sLink, sPlayer, 1, sCost )
+	elseif event == "CHAT_MSG_RAID_LEADER" then
+		local msg = select(1,...)
+		
+		local sPlayer, sLink, sCost;
+		-- check for general string match according to WebDKP
+		if string.find(msg, L.ReceivesLoot7) then
+			-- 1. extract player name and item form string
+			_, _, sPlayer, sLink = string.find(msg, L.ReceivesLoot7)
+			-- 2. extract cost from string (TODO: I am not sure if I can do that in 1 take)
+			_, _, _, sCost = string.find(msg, L.ReceivesLootDKP)
+		end
+		
+		if not sLink or not sPlayer or not sCost then return end
+		
+		self:Print("Added Item to DB")
 		self:AddLootItemDB( o.CurrentRaid, sLink, sPlayer, 1, sCost )
 
 	elseif event == "CHAT_MSG_LOOT" then
