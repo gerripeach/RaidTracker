@@ -170,6 +170,8 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 		
 		self:Print("Added Item to DB")
 		self:AddLootItemDB( o.CurrentRaid, sLink, sPlayer, 1, sCost )
+		self:FrameUpdate()
+		self:FrameUpdateView()
 	elseif event == "CHAT_MSG_RAID_LEADER" then
 		local msg = select(1,...)
 		
@@ -186,6 +188,8 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 		
 		self:Print("Added Item to DB")
 		self:AddLootItemDB( o.CurrentRaid, sLink, sPlayer, 1, sCost )
+		self:FrameUpdate()
+		self:FrameUpdateView()
 
 	elseif event == "CHAT_MSG_LOOT" then
 		local msg = select(1,...)
