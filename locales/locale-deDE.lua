@@ -14,8 +14,8 @@ L.ReceivesLoot4 = "Ihr erhaltet Beute: "..RT_ITEMREG_MULTI.."."
 L.ReceivesLoot5 = "([^%s]+) gewinnt: "..RT_ITEMREG_NOT_RETARDED
 L.ReceivesLoot6 = "Ihr gewinnt: "..RT_ITEMREG_NOT_RETARDED
 
-L.ReceivesLoot7 = "WebDKP: ([^%s]+) awarded "..RT_ITEMREG_NOT_RETARDED.." for: (.*) dkp."
-L.ReceivesLootDKP = "WebDKP: (.*) for: (.*) dkp."
+L.ReceivesLoot7 = "DKP: ([^%s]+) bekommt "..RT_ITEMREG_NOT_RETARDED.." f\195\188r: (.*) DKP."
+L.ReceivesLootDKP = "DKP: (.*) f\195\188r: (.*) DKP."
 
 L.ReceivesLootYou = "Ihr"
 
