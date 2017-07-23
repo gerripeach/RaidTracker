@@ -9,6 +9,7 @@ function RaidTracker:OnLoadCustom( frame )
 	frame:RegisterEvent("RAID_ROSTER_UPDATE")
 	frame:RegisterEvent("CHAT_MSG_LOOT")
 	frame:RegisterEvent("CHAT_MSG_SYSTEM")
+	frame:RegisterEvent("CHAT_MSG_RAID")
 	frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 	frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	frame:RegisterEvent("CHAT_MSG_MONSTER_YELL")
@@ -151,6 +152,23 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 		end
 		self:FrameUpdate()
 		self:FrameUpdateView()
+		
+	elseif event == "CHAT_MSG_RAID" then
+		local msg = select(1,...)
+		self:Print("CHAT_MSG_RAID")
+		
+		local sPlayer, sLink, sCost;
+		-- check for general string match according to WebDKP
+		if string.find(msg, L.ReceivesLoot7) then
+			-- 1. extract player name and item form string
+			_, _, sPlayer, sLink = string.find(msg, L.ReceivesLoot7)
+			-- 2. extract cost from string (TODO: I am not sure if I can do that in 1 take)
+			_, _, _, sCost = string.find(msg, L.ReceivesLootDKP)
+		end
+		
+		if not sLink or not sPlayer or not sCost then return end
+		
+		self:AddLootItemDB( o.CurrentRaid, sLink, sPlayer, 1, sCost )
 
 	elseif event == "CHAT_MSG_LOOT" then
 		local msg = select(1,...)
@@ -657,12 +675,12 @@ function RaidTracker:SnapshotSessionDB( )
 	tinsert(db.Log, 2, t)
 end
 
-function RaidTracker:CreateLootItemDB( frame, sLink, sPlayer, iCount, ioCostGet )
+function RaidTracker:CreateLootItemDB( frame, sLink, sPlayer, iCount, ioCostGet, sCost )
 	iCount = tonumber(iCount)
 	local o = self._options
 	local sColor, sItem, sName = self:GetLinkMeta(sLink)
 	if not sItem then return end
-	local sNote, sCost
+	local sNote
 
 	if ioCostGet then
 		local _, _, s0, s1, s2, s3 = string.find(sItem, "^(%d+):(%d+):(%d+):(%d+)")
@@ -717,7 +735,7 @@ function RaidTracker:CreateLootItemDB( frame, sLink, sPlayer, iCount, ioCostGet 
 	return t
 end
 
-function RaidTracker:AddLootItemDB( raidid, sLink, sPlayer, iCount )
+function RaidTracker:AddLootItemDB( raidid, sLink, sPlayer, iCount, sCost )
 	if not raidid then return end
 	iCount = tonumber(iCount)
 	local frame,db,o = RaidTrackerFrame,self._db,self._options
@@ -745,12 +763,14 @@ function RaidTracker:AddLootItemDB( raidid, sLink, sPlayer, iCount )
 	if ioStack then
 		for k, v in pairs(loot) do
 			if v.item.name == sName and v.player == sPlayer then
-				t = v.item; t.count = (t.count or 1) + ((iCount and iCount>0) and iCount or 1); break
+				t = v.item;
+				t.count = (t.count or 1) + ((iCount and iCount>0) and iCount or 1);
+				break
 			end
 		end
 	end
 	if not t then
-		t = self:CreateLootItemDB(frame, sLink, sPlayer, iCount, ioCostGet)
+		t = self:CreateLootItemDB(frame, sLink, sPlayer, iCount, ioCostGet, sCost)
 		if t then
 			t.id = #loot + 1;
 			tinsert(loot, t.id, t)
