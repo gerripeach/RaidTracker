@@ -11,6 +11,8 @@ L.ReceivesLoot1 = "([^%s]+) bekommt Beute: "..RT_ITEMREG.."."
 L.ReceivesLoot2 = "Ihr erhaltet Beute: "..RT_ITEMREG.."."
 L.ReceivesLoot3 = "([^%s]+) erh\195\164lt Beute: "..RT_ITEMREG_MULTI.."."
 L.ReceivesLoot4 = "Ihr erhaltet Beute: "..RT_ITEMREG_MULTI.."."
+L.ReceivesLoot5 = "([^%s]+) gewinnt: "..RT_ITEMREG_NOT_RETARDED
+L.ReceivesLoot6 = "Ihr gewinnt: "..RT_ITEMREG_NOT_RETARDED
 L.ReceivesLootYou = "Ihr"
 
 L.Yell_Majordomo = "Unm\195\182glich! Haltet ein, Sterbliche... Ich gebe auf! Ich gebe auf!"

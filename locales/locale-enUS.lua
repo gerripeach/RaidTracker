@@ -4,6 +4,8 @@ if not L then return end
 RT_ITEMREG =       "(|c%x+|Hitem:%d+:%d+:%d+:%d+:%d+:%d+:(%-?%d+):(%-?%d+):(%-?%d+)|h%[.-%]|h|r)%"
 RT_ITEMREG_MULTI = "(|c%x+|Hitem:%d+:%d+:%d+:%d+:%d+:%d+:(%-?%d+):(%-?%d+):(%-?%d+)|h%[.-%]|h|r)x(%d+)%"
 
+RT_ITEMREG_NOT_RETARDED = "(|c%x+|Hitem:%d+:%d+:%d+:%d+:%d+:%d+:(%-?%d+):(%-?%d+):(%-?%d+)|h%[.-%]|h|r)"
+
 -- addon messages
 L["Added %s to the selected raid."] = true
 L["Item Options"] = true

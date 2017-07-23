@@ -169,6 +169,11 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 			elseif	string.find(msg, L.ReceivesLoot4) then
 				_, _, sLink, iCount = string.find(msg, L.ReceivesLoot4)
 				sPlayer = YOU
+			elseif	string.find(msg, L.ReceivesLoot5) then
+				_, _, sPlayer, sLink = string.find(msg, L.ReceivesLoot5)
+			elseif	string.find(msg, L.ReceivesLoot6) then
+				_, _, sLink = string.find(msg, L.ReceivesLoot2)
+                sPlayer = YOU
 			end
 			if sPlayer and sPlayer == YOU then
 				sPlayer = (UnitName("player"))
