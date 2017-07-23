@@ -1,0 +1,10 @@
+## Interface: 30300
+## Title: LibKarma
+## Notes: Simple light-weight framework, utilites and libraries for addon development.
+## Author: Celess
+## Version: 1.1.2
+## X-Curse-Packaged-Version: r62
+## X-Curse-Project-Name: LibKarma
+## X-Curse-Project-ID: libkarma
+## X-Curse-Repository-ID: wow/libkarma/mainline
+lib.xml

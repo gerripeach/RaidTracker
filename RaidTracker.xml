@@ -1,0 +1,853 @@
+﻿<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="RaidTracker.lua" />
+
+	<ScrollFrame name="RT_MainFrameTemplate" inherits="FauxScrollFrameTemplate" hidden="true" virtual="true" >
+		<Size>
+			<AbsDimension x="301" y="334" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="19" y="-75" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</ScrollFrame>
+
+	<ScrollFrame name="RT_DetailFrame" inherits="FauxScrollFrameTemplate" hidden="true" virtual="true" >
+		<Size>
+			<AbsDimension x="301" y="334" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="348" y="-75" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentText" inherits="QuestTitleFont" text="" justifyH="LEFT" justifyV="TOP">
+					<Size>
+						<AbsDimension x="285" y="44" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-5" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<Button name="RT_DetailTab" inherits="RT_TabTemplate" virtual="true" >
+		<Scripts>
+			<OnClick>
+				RaidTracker:SortToggle(self)
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+
+	<Frame name="RaidTrackerFrame" hidden="true" parent="UIParent" toplevel="true" movable="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="682" y="433" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75" />
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentHeaderIcon" file="Interface\QuestFrame\UI-QuestLog-BookIcon">
+					<Size>
+						<AbsDimension x="56" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="9" y="-8" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture file="Interface\QuestFrame\UI-QuestLogDualPane-Left">
+					<Size>
+						<AbsDimension x="512" y="445"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0.0" right="1.0" top="0.0" bottom="0.86914"/>
+				</Texture>
+				<Texture file="Interface\QuestFrame\UI-QuestLogDualPane-RIGHT">
+					<Size>
+						<AbsDimension x="170" y="445"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+					<TexCoords left="0.0" right="0.6640625" top="0.0" bottom="0.86914"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentHeaderTitle" inherits="GameFontHighlight" text="Header Title">
+					<Size>
+						<AbsDimension x="570" y="14" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="20" y="-16" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHeaderVersion" inherits="GameFontNormalSmall" justifyH="RIGHT" text="">
+					<Size>
+						<AbsDimension x="70" y="14" />
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentHeaderTitle" >
+							<Offset>
+								<AbsDimension x="0" y="-1" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHeaderText" inherits="GameFontHighlightSmall" justifyH="LEFT" text="">
+					<Size>
+						<AbsDimension x="580" y="14" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentHeaderTitle" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="13" y="-7" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-8" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Frame name="$parentHeader">
+				<Size>
+					<AbsDimension x="54" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-46" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="$parentButtonNew" inherits="UIPanelButtonTemplate" text="New">
+						<Size>
+							<AbsDimension x="60" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" />
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								RaidTracker:CreateSessionDB()
+								RaidTracker:FrameUpdate()
+								RaidTracker:FrameUpdateView()
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="RaidTrackerFrameEndRaidButton" inherits="UIPanelButtonTemplate" text="End">
+						<Size>
+							<AbsDimension x="60" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentButtonNew" relativePoint="RIGHT" />
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								RaidTracker:EndSessionDB()
+								RaidTracker:FrameUpdate()
+								RaidTracker:FrameUpdateView()
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="RaidTrackerFrameSnapshotButton" inherits="UIPanelButtonTemplate" text="Snapshot">
+						<Size>
+							<AbsDimension x="76" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="RaidTrackerFrameEndRaidButton" relativePoint="RIGHT" />
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								RaidTracker:SnapshotSessionDB()
+								RaidTracker:FrameUpdate()
+								RaidTracker:FrameUpdateView()
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="RaidTrackerFrameDeleteButton" inherits="UIPanelButtonTemplate" text="Delete">
+						<Size>
+							<AbsDimension x="76" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="RaidTrackerFrameSnapshotButton" relativePoint="RIGHT" />
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								RT_Dialog:Show("RT_ConfirmDeleteFrame", "delete", "raid", RaidTrackerFrame.selected)
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Button name="$parentView2Button" inherits="UIPanelButtonTemplate" text="View Events">
+				<Size>
+					<AbsDimension x="125" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="17" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						RaidTracker:GetPage()
+						local parent = self:GetParent()
+						parent.type = (parent.type == "events") and "players" or "events"
+						RaidTracker:FrameUpdateView()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentViewButton" inherits="UIPanelButtonTemplate" text="View Items">
+				<Size>
+					<AbsDimension x="123" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentView2Button" relativePoint="RIGHT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						RaidTracker:GetPage()
+						local parent = self:GetParent()
+						if parent.type == "players" or parent.type == "events" or not parent.type then
+						parent.type = "items"
+						self:SetText("View Players")
+						elseif parent.type == "items" then
+						parent.type = "players"
+						self:SetText("View Items")
+						elseif parent.type == "playerraids" then
+						parent.type = "playeritems"
+						self:SetText("View Raids")
+						elseif parent.type == "playeritems" then
+						parent.type = "playerraids"
+						self:SetText("View Loot")
+						end
+						RaidTracker:FrameUpdateView()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentBackButton" inherits="UIPanelButtonTemplate" text="Back">
+				<Size>
+					<AbsDimension x="77" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentViewButton" relativePoint="RIGHT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						RaidTracker:GoBack()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<ScrollFrame name="RT_LogFrame" inherits="RT_MainFrameTemplate">
+				<Frames>
+					<Button name="$parentLine1" inherits="RT_ListLineTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine2" inherits="RT_ListLineTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine3" inherits="RT_ListLineTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine4" inherits="RT_ListLineTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine5" inherits="RT_ListLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine6" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine7" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine8" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine9" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine10" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine9" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine11" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine10" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine12" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine11" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine13" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine12" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine14" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine13" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine15" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine14" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine16" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine15" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine17" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine16" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine18" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine17" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine19" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine18" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine20" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine19" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine21" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine20" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine22" inherits="RT_ListLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine21" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 15, RT_ScrollFrameRaids_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<ScrollFrame name="RT_DetailFramePlayers" inherits="RT_DetailFrame">
+				<Frames>
+					<Button name="$parentTab1" inherits="RT_DetailTab" id="1" text="Player name">
+						<Size>
+							<AbsDimension x="120" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-26" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentTab2" inherits="RT_DetailTab" id="2" text="First join">
+						<Size>
+							<AbsDimension x="70" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Button name="$parentTab3" inherits="RT_DetailTab" id="3" text="Last leave">
+						<Size>
+							<AbsDimension x="70" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Frame name="$parentLine1" inherits="RT_PlayersLineTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentText" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine2" inherits="RT_PlayersLineTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine3" inherits="RT_PlayersLineTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine4" inherits="RT_PlayersLineTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine5" inherits="RT_PlayersLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine6" inherits="RT_PlayersLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine7" inherits="RT_PlayersLineTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine8" inherits="RT_PlayersLineTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine9" inherits="RT_PlayersLineTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine10" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine9" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine11" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine10" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine12" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine11" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine13" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine12" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine14" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine13" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine15" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine14" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine16" inherits="RT_PlayersLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine15" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 18, RT_DetailScrollFramePlayers_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<ScrollFrame name="RT_DetailFrameItems" inherits="RT_DetailFrame">
+				<Frames>
+					<Frame name="RT_RarityDropdownFrame" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="16" y="1" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_Initialize( self, RT_DetailFrameItems_RarityDropdown_Initialize )
+								UIDropDownMenu_SetSelectedID( self, 1)
+								UIDropDownMenu_SetWidth(self, 90)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Button name="$parentTab1" inherits="RT_DetailTab" id="1" text="Item name">
+						<Size>
+							<AbsDimension x="90" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-26" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentTab2" inherits="RT_DetailTab" id="2" text="Time looted">
+						<Size>
+							<AbsDimension x="85" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Button name="$parentTab3" inherits="RT_DetailTab" id="3" text="Looter">
+						<Size>
+							<AbsDimension x="70" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Button name="$parentTab4" inherits="RT_DetailTab" id="4" text="Rarity">
+						<Size>
+							<AbsDimension x="58" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine1" inherits="RT_ItemsLineTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentText" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine2" inherits="RT_ItemsLineTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine3" inherits="RT_ItemsLineTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine4" inherits="RT_ItemsLineTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine5" inherits="RT_ItemsLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+					<Button name="$parentLine6" inherits="RT_ItemsLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM" />
+						</Anchors>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 41, RT_DetailScrollFrameItems_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<ScrollFrame name="RT_DetailFrameRaids" inherits="RT_DetailFrame">
+				<Frames>
+					<Button name="$parentTab1" inherits="RT_DetailTab" id="1" text="Raid date">
+						<Size>
+							<AbsDimension x="163" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-26" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentTabLooter" inherits="RT_DetailTab" hidden="true" id="2" text="Looter">
+						<Anchors>
+							<Anchor point="RIGHT" />
+							<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Frame name="$parentLine1" inherits="RT_RaidsLineTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentText" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine2" inherits="RT_RaidsLineTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine3" inherits="RT_RaidsLineTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine4" inherits="RT_RaidsLineTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine5" inherits="RT_RaidsLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine6" inherits="RT_RaidsLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine7" inherits="RT_RaidsLineTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine8" inherits="RT_RaidsLineTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine9" inherits="RT_RaidsLineTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine10" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine9" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine11" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine10" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine12" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine11" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine13" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine12" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine14" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine13" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine15" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine14" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine16" inherits="RT_RaidsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine15" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 18, RT_DetailScrollFramePlayer_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<ScrollFrame name="RT_DetailFrameEvents" inherits="RT_DetailFrame">
+				<Frames>
+					<Button name="$parentTab1" inherits="RT_DetailTab" id="1" text="Boss">
+						<Size>
+							<AbsDimension x="163" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-26" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentTabBoss" inherits="RT_DetailTab" hidden="true" id="2" text="Kill date">
+						<Size>
+							<AbsDimension x="93" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT" />
+						</Anchors>
+					</Button>
+					<Frame name="$parentLine1" inherits="RT_EventsLineTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentText" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine2" inherits="RT_EventsLineTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine1" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine3" inherits="RT_EventsLineTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine2" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine4" inherits="RT_EventsLineTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine3" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine5" inherits="RT_EventsLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine4" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine6" inherits="RT_EventsLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine5" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine7" inherits="RT_EventsLineTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine6" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine8" inherits="RT_EventsLineTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine7" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine9" inherits="RT_EventsLineTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine8" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine10" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine9" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine11" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine10" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine12" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine11" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine13" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine12" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine14" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine13" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine15" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine14" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine16" inherits="RT_EventsLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentLine15" relativePoint="BOTTOM" />
+						</Anchors>
+					</Frame>				</Frames>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 18, RT_DetailScrollFrameEvents_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				RaidTracker:FrameUpdate()
+				RaidTracker:FrameUpdateView()
+			</OnShow>
+			<OnDragStart>
+				self:StartMoving()
+				self.isMoving = true
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing()
+				self.isMoving = false
+			</OnDragStop>
+			<OnLoad>
+				self:RegisterForDrag("LeftButton")
+				self.LastPage = { }
+				if RaidTracker then RaidTracker:OnLoad(self) end
+			</OnLoad>
+			<OnEvent>
+				RaidTracker:OnEvent(self, event, ...)
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+</Ui>
