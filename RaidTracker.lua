@@ -191,6 +191,8 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 		self:FrameUpdate()
 		self:FrameUpdateView()
 
+		
+		--[[		
 	elseif event == "CHAT_MSG_LOOT" then
 		local msg = select(1,...)
 		if not o.CurrentRaid and self:CanAutoCreateLog() then
@@ -223,8 +225,11 @@ function RaidTracker:OnEventCustom( frame, event, ... )
 			self:AddLootItemDB( o.CurrentRaid, sLink, sPlayer, iCount )
 		end
 		self:FrameUpdate()
-		self:FrameUpdateView()
-
+		self:FrameUpdateView()		
+		]]--
+		
+		
+		
 	elseif event == "UPDATE_MOUSEOVER_UNIT" then
 		if o.AutoEvent == 1 and not UnitIsFriend("mouseover", "player") and not UnitInRaid("mouseover") and not UnitInParty("mouseover") then
 			self:Debug("possible mouseover unit update", unit)
